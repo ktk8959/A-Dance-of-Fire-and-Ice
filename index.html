@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D A Dance of Fire and Ice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <!-- 3D ???    ????  ????   ???   ?  ??????? ??????-->
+    <div id="labels-container"></div>
+
+    <div id="ui-layer">
+      <div id="start-screen">
+        <h1 class="title">A DANCE OF<br>FIRE AND ICE</h1>
+        <p class="blink">Press Any Key to Start</p>
+      </div>
+      <div id="game-ui" style="display: none;">
+        <div class="score-container">
+          <p id="level-title"></p>
+          <p>Score: <span id="score">0</span></p>
+          <p class="hint">Press ESC to return to Hub</p>
+          <p class="hint">Press 'A' to toggle Auto-Play</p>
+          <label style="color: #fff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-top: 10px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;">
+                        <input type="checkbox" id="auto-play-toggle" style="width: 15px; height: 15px;">
+            AI Auto-Play
+          </label>
+          
+        </div>
+      </div>
+      <div id="game-over-screen" style="display: none;">
+        <h1 class="title">Game Over</h1>
+        <p>Final Score: <span id="final-score">0</span></p>
+        <p class="blink" style="margin-top: 20px;">Press Any Key to Restart Level</p>
+        <p class="hint" style="margin-top: 10px;">Press ESC to return to Hub</p>
+      </div>
+      <div id="countdown-screen" style="display: none; font-size: 8rem; font-weight: 700; text-shadow: 0 0 30px rgba(255,255,255,0.8); color: white;">
+        3
+      </div>
+      <div id="judgment-text" style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 3rem; font-weight: 700; text-shadow: 0 0 10px rgba(255,255,255,0.8); opacity: 0; pointer-events: none; z-index: 100; text-transform: uppercase; font-style: italic;">
+        Perfect
+      </div>
+    </div>
+    
+    <audio id="bgm">
+        <!-- The src will be set dynamically via JS -->
+    </audio>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
