@@ -21,7 +21,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
 dirLight.position.set(10, 30, 10);
-dirLight.castShadow = true;
+dirLight.castShadow = false;
 scene.add(dirLight);
 
 const floorGeo = new THREE.PlaneGeometry(500, 500);
@@ -524,6 +524,7 @@ function updateCamera(instant = false) {
     camera.position.copy(cameraTarget).add(offset);
     camera.lookAt(cameraTarget);
     dirLight.target.position.copy(cameraTarget);
+    dirLight.position.copy(cameraTarget).add(new THREE.Vector3(10, 30, 10));
     dirLight.target.updateMatrixWorld();
     if (floor) { floor.position.x = cameraTarget.x; floor.position.z = cameraTarget.z; }
 }
@@ -617,4 +618,5 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
 
