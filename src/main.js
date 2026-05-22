@@ -526,7 +526,7 @@ function updateCamera(instant = false) {
     dirLight.target.position.copy(cameraTarget);
     dirLight.position.copy(cameraTarget).add(new THREE.Vector3(10, 30, 10));
     dirLight.target.updateMatrixWorld();
-    if (floor) { floor.position.x = cameraTarget.x; floor.position.z = cameraTarget.z; }
+    if (floor) { floor.position.x = cameraTarget.x; floor.position.z = cameraTarget.z; floor.position.y = cameraTarget.y - 30; }
 }
 
 function updateLabels() {
@@ -618,5 +618,6 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
 
 
