@@ -2703,7 +2703,7 @@ levels['hub'] = {
     path: ['R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R'],
     branches: {
         2: { dir: 'U', levelId: 'level1', name: 'Level 1: The Beginning' },
-        15: { dir: 'U', levelId: 'level5', name: 'Level 5: Hungarian Dance' },
+        15: { dir: 'U', levelId: 'level5', name: 'Level 5: Plum - R' },
         6: { dir: 'U', levelId: 'level2', name: 'Level 2: Fast Track' },
         9: { dir: 'U', levelId: 'level3', name: 'Level 3: 3D Vertigo' },
         13: { dir: 'U', levelId: 'level4', name: 'Level 4: Nada Nada' }
@@ -2773,77 +2773,59 @@ levels['level4'] = {
 
 
 
-const hungarianPath = [];
-const hungarianEvents = {};
 
-function getAngleDeg(dir1, dir2) {
-    const dirs = { 'R': 0, 'U': 90, 'L': 180, 'D': 270 };
-    if (!dir1) return 180;
-    let diff = Math.abs(dirs[dir2] - dirs[dir1]);
-    if (diff === 270) diff = 90;
-    return diff === 0 ? 180 : diff;
-}
+const plumRPath = [];
+const plumREvents = {};
 
-(function subdivideHungarian() {
-    let currentBpm = 144;
-    let newIdx = 0;
-    const V_target = 300; 
-
-    for (let i = 0; i < origHungarianPath.length; i++) {
-        let evt = origHungarianEvents[i] || {};
-        let origBpm = evt.bpm || currentBpm;
-        currentBpm = origBpm;
+(function generatePlum() {
+    let currentDirIdx = 0;
+    const dirs = ['R', 'U', 'L', 'D'];
+    let totalTiles = 435;
+    
+    // Intro
+    for (let i = 0; i < 20; i++) {
+        plumRPath.push('R');
+    }
+    
+    // Patterns
+    for (let i = 20; i < totalTiles; i++) {
+        let section = Math.floor((i - 20) / 40);
         
-        let prevDir = i > 0 ? origHungarianPath[i - 1] : null;
-        let currDir = origHungarianPath[i];
-        let angle = getAngleDeg(prevDir, currDir);
-        if (angle === 0) angle = 180; 
-        
-        let N = Math.round((V_target / origBpm - 1) * (angle / 180)) + 1;
-        if (N < 1) N = 1;
-        if (N > 8) N = 8;
-        if (origBpm >= 780) N = 1; 
-        
-        let newBpm = origBpm * (1 + (N - 1) * (180 / angle));
-        
-        for (let k = 0; k < N; k++) {
-            hungarianPath.push(currDir);
-            
-            let newEvt = Object.assign({}, evt);
-            newEvt.bpm = newBpm;
-            
-            if (k > 0) {
-                delete newEvt.camera;
-                delete newEvt.angle;
-                delete newEvt.height;
-                delete newEvt.radius;
-                delete newEvt.type;
-                delete newEvt.amount;
-                delete newEvt.twirl;
+        if (section % 4 === 0) {
+            plumRPath.push(i % 2 === 0 ? 'R' : 'U');
+        } else if (section % 4 === 1) {
+            if (i % 2 === 0) {
+                currentDirIdx = (currentDirIdx + 1) % 4;
             }
-            
-            if (newIdx % 2 === 0) {
-                newEvt.color = 16777215; 
-            } else {
-                newEvt.color = 2236962; 
-            }
-            
-            if (Object.keys(newEvt).length > 0) {
-                hungarianEvents[newIdx] = newEvt;
-            }
-            
-            newIdx++;
+            plumRPath.push(dirs[currentDirIdx]);
+            if (i % 16 === 0) plumREvents[i] = { type: 'twirl' };
+        } else if (section % 4 === 2) {
+            plumRPath.push('R');
+            if (i % 20 === 0) plumREvents[i] = { type: 'camera', angle: Math.PI / 4, height: 5, radius: 25 };
+            if (i % 20 === 10) plumREvents[i] = { type: 'camera', angle: 0, height: 15, radius: 10 };
+            if (i % 10 === 0) plumREvents[i] = { type: 'elevation', amount: 2 };
+            if (i % 10 === 5) plumREvents[i] = { type: 'elevation', amount: -2 };
+        } else {
+            plumRPath.push(i % 2 === 0 ? 'L' : 'D');
+            if (i % 20 === 0) plumREvents[i] = { type: 'speed', bpm: 250 };
+            if (i % 20 === 10) plumREvents[i] = { type: 'speed', bpm: 180 };
         }
     }
+    
+    for(let i = 50; i < totalTiles; i += 50) {
+        if (!plumREvents[i]) plumREvents[i] = {};
+        Object.assign(plumREvents[i], { type: 'camera', angle: Math.PI, height: 30, radius: 40 });
+        
+        if (!plumREvents[i+15]) plumREvents[i+15] = {};
+        Object.assign(plumREvents[i+15], { type: 'camera', angle: 0, height: 22, radius: 0 });
+    }
 })();
+
 levels['level5'] = {
     id: 'level5',
-    name: 'Level 5: Hungarian Dance No. 5',
-    bpm: 780,
-    audioSrc: '/Hungarian Dance No.5.mp3',
-    path: hungarianPath,
-    events: hungarianEvents
+    name: 'Level 5: Plum - R',
+    bpm: 180,
+    audioSrc: '/plum-r.mp3',
+    path: plumRPath,
+    events: plumREvents
 };
-
-
-

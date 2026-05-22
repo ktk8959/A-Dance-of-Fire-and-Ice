@@ -79,7 +79,6 @@ class ProceduralMusic {
         
         const bgm = document.getElementById('bgm');
         if (this.levelData.audioSrc && bgm) {
-            // 이전 404 캐시가 걸리는 현상을 영구 차단하기 위해 캐시 버스터(?t=현재시간)를 붙여줍니다.
             bgm.src = this.levelData.audioSrc + '?t=' + Date.now();
             bgm.volume = 0.5;
             bgm.currentTime = 0;
@@ -238,3 +237,4 @@ class ProceduralMusic {
 }
 
 export const musicPlayer = new ProceduralMusic();
+
