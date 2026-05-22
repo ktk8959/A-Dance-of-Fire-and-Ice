@@ -63,11 +63,7 @@ class ProceduralMusic {
             
             if (levelData.events && levelData.events[i + 1]) {
                 const ev = levelData.events[i + 1];
-                if (ev.type === 'twirl') {
-                    orbitDir *= -1;
-                } else if (ev.type === 'speed') {
-                    currentBPM = ev.bpm;
-                }
+                if (ev.type === 'twirl' || ev.twirl === true) { orbitDir *= -1; } if (ev.type === 'speed' || ev.bpm !== undefined) { currentBPM = ev.bpm; }
             }
             
             startAngle = Math.atan2(pivot.z - next.z, pivot.x - next.x);
@@ -237,4 +233,5 @@ class ProceduralMusic {
 }
 
 export const musicPlayer = new ProceduralMusic();
+
 
