@@ -2774,82 +2774,196 @@ levels['level4'] = {
 
 
 
-const plumRPath = [];
-const plumREvents = {};
 
-(function generatePlum() {
-    let tileIndex = 0;
-    
-    function addPath(dirs, elevationPerTile = 0, speed = 0, twirlMod = 0) {
-        for (let i = 0; i < dirs.length; i++) {
-            plumRPath.push(dirs[i]);
-            let ev = {};
-            if (elevationPerTile !== 0) {
-                ev.type = 'elevation';
-                ev.amount = elevationPerTile;
-            }
-            if (speed !== 0 && i === 0) {
-                ev.type = 'speed';
-                ev.bpm = speed;
-            }
-            if (twirlMod > 0 && i % twirlMod === 0) {
-                ev.type = 'twirl';
-            }
-            if (Object.keys(ev).length > 0) plumREvents[tileIndex] = ev;
-            tileIndex++;
-        }
-    }
-
-    // 1. Intro (Fast Straight)
-    addPath(['R','R','R','R','R','R','R','R','R','R'], 0, 300);
-    
-    // 2. Star Tower (from Image 2) - 4 pointed star twisting upwards!
-    const starPiece = ['U', 'E', 'R', 'C', 'R', 'C', 'D', 'Z', 'D', 'Z', 'L', 'Q', 'L', 'Q', 'U', 'E'];
-    // Add camera circling event
-    plumREvents[tileIndex] = { type: 'camera', angle: Math.PI / 3, height: 15, radius: 25 };
-    for (let i = 0; i < 6; i++) {
-        // elevation of 0.5 per tile makes a smooth 3D helix star
-        addPath(starPiece, 0.5); 
-    }
-    
-    // 3. Drop down & bridge
-    plumREvents[tileIndex] = { type: 'camera', angle: 0, height: 10, radius: 10 };
-    addPath(['R','R','E','C','R','R','E','C','R','R'], -2, 400); // Super fast drop
-    
-    // 4. Large Hollow Octagon (from Image 1 clover/knot)
-    const cloverPiece = ['R', 'C', 'D', 'D', 'Z', 'L', 'L', 'Q', 'U', 'U', 'E', 'R'];
-    plumREvents[tileIndex] = { type: 'camera', angle: Math.PI / 4, height: 20, radius: 30 };
-    for (let i = 0; i < 8; i++) {
-        addPath(cloverPiece, 0.4); 
-    }
-    
-    // 5. Fast Zig-Zag Bridge
-    plumREvents[tileIndex] = { type: 'camera', angle: 0, height: 15, radius: 15 };
-    addPath(['E','C','E','C','E','C','E','C','E','C','E','C'], 0, 450);
-    
-    // 6. Double Star Tower (Reverse elevation, going down)
-    plumREvents[tileIndex] = { type: 'camera', angle: -Math.PI / 3, height: -10, radius: 25 };
-    for (let i = 0; i < 6; i++) {
-        addPath(starPiece, -0.5, 300); 
-    }
-    
-    // 7. Small Magic Circles with Twirls
-    const smallCircle = ['R', 'C', 'D', 'Z', 'L', 'Q', 'U', 'E'];
-    plumREvents[tileIndex] = { type: 'camera', angle: Math.PI / 2, height: 30, radius: 0 }; // Top down view
-    for (let i = 0; i < 8; i++) {
-        addPath(smallCircle, 0, 350, 4); // Twirl every 4 tiles
-    }
-    
-    // 8. Outro
-    plumREvents[tileIndex] = { type: 'camera', angle: 0, height: 10, radius: 10 };
-    addPath(['R','R','R','R','R','R','R','R','R','R'], 0, 200);
-
-})();
+const plumRPath = ['R','U','U','U','U','L','D','D','D','D','R','U','U','U','U','U','L','L','L','L','D','D','D','D','R','U','U','U','U','L','D','D','D','D','D','R','R','R','R','R','R','R','R','U','U','R','R','U','U','U','U','U','L','D','D','R','R','U','U','R','R','U','U','R','R','R','R','R','R','U','L','D','R','U','L','D','R','R','R','R','R','R','R','R','U','L','D','D','D','R','U','L','D','D','D','R','U','L','D','D','D','D','R','D','D','R','U','L','D','D','D','R','U','L','D','D','D','R','U','L','D','D','D','D','R','R','U','L','D','R','R','R','U','L','D','R','D','R','D','R','R','R','R','R','D','R','D','R','R','R','U','L','D','R','R','U','Z','R','R','R','R','U','U','U','L','L','D','D','D','R','R','R','U','L','D','R','D','R','D','R','R','R','R','R','D','R','D','R','R','R','U','L','D','R','R','U','Z','R','R','R','U','L','D','D','R','R','R','U','Z','R','R','U','Z','R','R','U','R','R','U','U','U','U','L','D','R','R','R','U','U','R','R','R','R','U','L','L','R','U','L','U','R','U','L','U','R','U','L','L','U','L','D','E','L','L','L','L','L','U','R','R','R','U','L','L','L','U','R','R','U','L','U','R','U','L','U','R','R','R','R','R','R','R','R','R','D','L','L','D','D','D','R','R','Q','D','R','U','U','U','R','R','U','L','U','R','U','L','U','R','U','L','L','U','R','R','U','L','L','U','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','U','L','L','U','R','R','U','L','L','U','R','R','R','R','R','U','L','D','R','R','R','D','L','L','D','R','R','D','L','L','L','D','R','R','R','D','D','R','R','U','L','D','D','R','R','R','U','U','U','R','U','Z','R','R','R','D','L','L','D','R','R','D','L','L','L','D','R','R','R','R','U','R','R','U','L','D','D','R','R','R','U','U','U','U','U','L','D','R','R','R','R','R','R','D','L','L','U','R','R','R','R','U','L','D','R','R','R','U','U','R','R','U','L','D','D','R','R','R','R','R','R','D','R','Q','D','R','R','R','R','R','R','D','L','L','U','R','R','R','R','R','R','R','R','U','U','R','R','U','L','D','D','R','R','D','R','D','R','R','R','U','L','D','R','R','E','U','L','Z','D','D','C','R','U','Q','L','L','Z','D','R','E','U','U','Q','L','D','C','R','R','R','E','U','U','L','L','Z','D','D','D','D','C','R','R','U','U','Q','L','L','L','L','Z','D','D','R','R','E','U','U','U','U','Q','L','L','D','D','C','R','R','R','R','R','R','R','R','R','R','U','L','U','R','U','L','U','R','R','Q','D','R','R','Q','D','R','R','R','U','L','U','R','R','R','R','R','D','L','U','R','R','R','D','L','D','R','D','L','C','L','C','L','D','R','D','L','D','R','D','R','C','R','Q','R','C','E','Q','E','Q','Z','L','E','L','Z','L','U','E','U','Z','U','E','Q','Z','Q','Z','C','D','Q','D','C','D','L','Q','L','C','L','Q','Z','C','Z','C','E','R','Z','R','E','R','D','Z','D','E','D','Z','C','E','C','E','Q','U','C','U','Q','U','R','R','R','R','R','R','R','R','R','U','L','U','R','U','L','U','R','R','Q','D','R','R','Q','D','R','R','R','U','L','U','R','U','R','U','R','R','R','U','Z','R','U','Z','R'];
+const plumREvents = {420: { type: 'camera', angle: -0.785, height: 20, radius: 25 },
+687: { type: 'speed', bpm: 720 },
+552: { type: 'speed', bpm: 540 },
+240: { type: 'camera', angle: 0.785, height: 20, radius: 25 },
+670: { type: 'speed', bpm: 360 },
+399: { type: 'twirl' },
+514: { type: 'speed', bpm: 540 },
+396: { type: 'twirl' },
+390: { type: 'camera', angle: 0, height: 15, radius: 10 },
+365: { type: 'twirl' },
+362: { type: 'twirl' },
+360: { type: 'camera', angle: 0.785, height: 20, radius: 25 },
+359: { type: 'speed', bpm: 180 },
+678: { type: 'twirl' },
+150: { type: 'camera', angle: 0, height: 15, radius: 10 },
+210: { type: 'camera', angle: 0, height: 15, radius: 10 },
+349: { type: 'twirl' },
+699: { type: 'twirl' },
+346: { type: 'twirl' },
+343: { type: 'twirl' },
+340: { type: 'twirl' },
+337: { type: 'speed', bpm: 360 },
+330: { type: 'camera', angle: 0, height: 15, radius: 10 },
+703: { type: 'twirl' },
+321: { type: 'speed', bpm: 720 },
+319: { type: 'twirl' },
+317: { type: 'twirl' },
+314: { type: 'twirl' },
+311: { type: 'twirl' },
+308: { type: 'twirl' },
+306: { type: 'twirl' },
+304: { type: 'twirl' },
+302: { type: 'twirl' },
+180: { type: 'camera', angle: -0.785, height: 20, radius: 25 },
+300: { type: 'camera', angle: -0.785, height: 20, radius: 25 },
+299: { type: 'speed', bpm: 360 },
+723: { type: 'twirl' },
+720: { type: 'camera', angle: 0.785, height: 20, radius: 25 },
+717: { type: 'speed', bpm: 180 },
+715: { type: 'twirl' },
+280: { type: 'twirl' },
+243: { type: 'twirl' },
+276: { type: 'speed', bpm: 720 },
+274: { type: 'twirl' },
+272: { type: 'twirl' },
+270: { type: 'twirl', angle: 0, height: 15, radius: 10 },
+268: { type: 'twirl' },
+697: { type: 'twirl' },
+265: { type: 'twirl' },
+695: { type: 'speed', bpm: 360 },
+261: { type: 'twirl' },
+691: { type: 'twirl' },
+690: { type: 'camera', angle: 0, height: 15, radius: 10 },
+257: { type: 'speed', bpm: 360 },
+256: { type: 'twirl' },
+686: { type: 'speed', bpm: 360 },
+685: { type: 'twirl' },
+684: { type: 'speed', bpm: 540 },
+683: { type: 'twirl' },
+682: { type: 'speed', bpm: 180 },
+681: { type: 'speed', bpm: 540 },
+679: { type: 'twirl' },
+247: { type: 'speed', bpm: 180 },
+245: { type: 'twirl' },
+675: { type: 'speed', bpm: 540 },
+674: { type: 'twirl' },
+673: { type: 'speed', bpm: 180 },
+672: { type: 'twirl' },
+671: { type: 'speed', bpm: 540 },
+239: { type: 'twirl' },
+669: { type: 'twirl' },
+668: { type: 'speed', bpm: 540 },
+667: { type: 'twirl' },
+666: { type: 'speed', bpm: 180 },
+665: { type: 'speed', bpm: 540 },
+663: { type: 'twirl' },
+662: { type: 'twirl' },
+660: { type: 'speed', bpm: 360, angle: -0.785, height: 20, radius: 25 },
+659: { type: 'speed', bpm: 540 },
+658: { type: 'twirl' },
+657: { type: 'speed', bpm: 180 },
+656: { type: 'twirl' },
+655: { type: 'speed', bpm: 540 },
+223: { type: 'speed', bpm: 360 },
+653: { type: 'twirl' },
+652: { type: 'speed', bpm: 540 },
+651: { type: 'twirl' },
+650: { type: 'speed', bpm: 180 },
+649: { type: 'speed', bpm: 540 },
+647: { type: 'twirl' },
+646: { type: 'twirl' },
+644: { type: 'speed', bpm: 360 },
+643: { type: 'speed', bpm: 540 },
+642: { type: 'twirl' },
+641: { type: 'speed', bpm: 180 },
+640: { type: 'twirl' },
+639: { type: 'speed', bpm: 540 },
+638: { type: 'speed', bpm: 360 },
+637: { type: 'twirl' },
+636: { type: 'speed', bpm: 540 },
+635: { type: 'twirl' },
+634: { type: 'speed', bpm: 180 },
+633: { type: 'speed', bpm: 540 },
+120: { type: 'camera', angle: 0.785, height: 20, radius: 25 },
+631: { type: 'twirl' },
+630: { type: 'twirl', angle: 0, height: 15, radius: 10 },
+628: { type: 'speed', bpm: 360 },
+627: { type: 'speed', bpm: 540 },
+626: { type: 'twirl' },
+625: { type: 'speed', bpm: 180 },
+624: { type: 'twirl' },
+623: { type: 'speed', bpm: 540 },
+622: { type: 'twirl' },
+621: { type: 'twirl' },
+619: { type: 'twirl' },
+617: { type: 'twirl' },
+615: { type: 'twirl' },
+614: { type: 'twirl' },
+613: { type: 'twirl' },
+612: { type: 'twirl' },
+611: { type: 'twirl' },
+609: { type: 'twirl' },
+607: { type: 'twirl' },
+600: { type: 'camera', angle: 0.785, height: 20, radius: 25 },
+593: { type: 'twirl' },
+284: { type: 'speed', bpm: 180 },
+676: { type: 'speed', bpm: 360 },
+581: { type: 'twirl' },
+579: { type: 'twirl' },
+577: { type: 'twirl' },
+575: { type: 'twirl' },
+573: { type: 'speed', bpm: 360 },
+570: { type: 'camera', angle: 0, height: 15, radius: 10 },
+564: { type: 'speed', bpm: 720 },
+562: { type: 'speed', bpm: 540 },
+561: { type: 'speed', bpm: 720 },
+560: { type: 'speed', bpm: 360 },
+559: { type: 'speed', bpm: 720 },
+557: { type: 'speed', bpm: 540 },
+554: { type: 'speed', bpm: 720 },
+701: { type: 'twirl' },
+551: { type: 'speed', bpm: 720 },
+550: { type: 'speed', bpm: 360 },
+549: { type: 'speed', bpm: 720 },
+547: { type: 'speed', bpm: 540 },
+544: { type: 'speed', bpm: 720 },
+542: { type: 'speed', bpm: 540 },
+541: { type: 'speed', bpm: 720 },
+540: { type: 'speed', bpm: 360, angle: -0.785, height: 20, radius: 25 },
+539: { type: 'speed', bpm: 720 },
+537: { type: 'speed', bpm: 540 },
+534: { type: 'speed', bpm: 720 },
+532: { type: 'speed', bpm: 540 },
+531: { type: 'speed', bpm: 720 },
+530: { type: 'speed', bpm: 360 },
+529: { type: 'speed', bpm: 720 },
+527: { type: 'speed', bpm: 540 },
+525: { type: 'speed', bpm: 720 },
+523: { type: 'speed', bpm: 540 },
+522: { type: 'speed', bpm: 360 },
+90: { type: 'camera', angle: 0, height: 15, radius: 10 },
+520: { type: 'speed', bpm: 540 },
+519: { type: 'speed', bpm: 720 },
+517: { type: 'speed', bpm: 540 },
+516: { type: 'speed', bpm: 360 },
+83: { type: 'speed', bpm: 180 },
+513: { type: 'speed', bpm: 720 },
+511: { type: 'speed', bpm: 540 },
+510: { type: 'speed', bpm: 360, angle: 0, height: 15, radius: 10 },
+508: { type: 'speed', bpm: 540 },
+507: { type: 'speed', bpm: 720 },
+505: { type: 'speed', bpm: 540 },
+504: { type: 'speed', bpm: 360 },
+241: { type: 'twirl' },
+502: { type: 'speed', bpm: 540 },
+501: { type: 'speed', bpm: 720 },
+65: { type: 'speed', bpm: 360 },
+60: { type: 'camera', angle: -0.785, height: 20, radius: 25 },
+654: { type: 'speed', bpm: 360 },
+480: { type: 'camera', angle: 0.785, height: 20, radius: 25 },
+30: { type: 'camera', angle: 0, height: 15, radius: 10 },
+450: { type: 'camera', angle: 0, height: 15, radius: 10 },
+0: { type: 'camera', angle: 0.785, height: 20, radius: 25 }};
 
 levels['level5'] = {
     id: 'level5',
-    name: 'Level 5: Plum - R (3D Magic Shapes)',
-    bpm: 300, 
+    name: 'Level 5: Plum - R (Original 1:1 Map)',
+    bpm: 180,
     audioSrc: '/plum-r.mp3',
     path: plumRPath,
     events: plumREvents
