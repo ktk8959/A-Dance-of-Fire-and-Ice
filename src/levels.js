@@ -2778,53 +2778,55 @@ const plumRPath = [];
 const plumREvents = {};
 
 (function generatePlum() {
-    let currentDirIdx = 0;
-    const dirs = ['R', 'U', 'L', 'D'];
-    let totalTiles = 435;
+    let totalTiles = 500;
     
     // Intro
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
         plumRPath.push('R');
     }
     
-    // Patterns
-    for (let i = 20; i < totalTiles; i++) {
-        let section = Math.floor((i - 20) / 40);
+    // Octagon Magic Circles
+    const octagon = ['R', 'C', 'D', 'Z', 'L', 'Q', 'U', 'E'];
+    const octagonRev = ['R', 'E', 'U', 'Q', 'L', 'Z', 'D', 'C'];
+    const fastZigZag = ['E', 'C', 'E', 'C', 'E', 'C', 'E', 'C'];
+    const fastZigZag2 = ['R', 'U', 'L', 'U', 'R', 'U', 'L', 'U'];
+    
+    for (let i = 15; i < totalTiles; i++) {
+        let section = Math.floor((i - 15) / 40);
         
         if (section % 4 === 0) {
-            plumRPath.push(i % 2 === 0 ? 'R' : 'U');
+            // Magic Circle Octagon
+            let idx = (i - 15) % 8;
+            plumRPath.push(octagon[idx]);
+            if (idx === 7) plumREvents[i] = { type: 'twirl' };
         } else if (section % 4 === 1) {
-            if (i % 2 === 0) {
-                currentDirIdx = (currentDirIdx + 1) % 4;
-            }
-            plumRPath.push(dirs[currentDirIdx]);
-            if (i % 16 === 0) plumREvents[i] = { type: 'twirl' };
+            // High speed diagonal zigzags
+            plumRPath.push(i % 2 === 0 ? 'E' : 'C');
+            if (i % 20 === 0) plumREvents[i] = { type: 'speed', bpm: 400 };
+            if (i % 20 === 19) plumREvents[i] = { type: 'speed', bpm: 200 };
         } else if (section % 4 === 2) {
-            plumRPath.push('R');
-            if (i % 20 === 0) plumREvents[i] = { type: 'camera', angle: Math.PI / 4, height: 5, radius: 25 };
-            if (i % 20 === 10) plumREvents[i] = { type: 'camera', angle: 0, height: 15, radius: 10 };
-            if (i % 10 === 0) plumREvents[i] = { type: 'elevation', amount: 2 };
-            if (i % 10 === 5) plumREvents[i] = { type: 'elevation', amount: -2 };
+            // Reverse Octagon
+            let idx = (i - 15) % 8;
+            plumRPath.push(octagonRev[idx]);
+            if (idx === 7) plumREvents[i] = { type: 'twirl' };
         } else {
-            plumRPath.push(i % 2 === 0 ? 'L' : 'D');
-            if (i % 20 === 0) plumREvents[i] = { type: 'speed', bpm: 250 };
-            if (i % 20 === 10) plumREvents[i] = { type: 'speed', bpm: 180 };
+            // Intense stairs
+            plumRPath.push(i % 2 === 0 ? 'R' : 'U');
+            if (i % 20 === 0) plumREvents[i] = { type: 'speed', bpm: 300 };
         }
-    }
-    
-    for(let i = 50; i < totalTiles; i += 50) {
-        if (!plumREvents[i]) plumREvents[i] = {};
-        Object.assign(plumREvents[i], { type: 'camera', angle: Math.PI, height: 30, radius: 40 });
         
-        if (!plumREvents[i+15]) plumREvents[i+15] = {};
-        Object.assign(plumREvents[i+15], { type: 'camera', angle: 0, height: 22, radius: 0 });
+        // Camera events
+        if (i % 40 === 0) {
+            plumREvents[i] = Object.assign(plumREvents[i] || {}, { type: 'camera', angle: Math.PI / 2, height: 25, radius: 25 });
+            plumREvents[i + 20] = Object.assign(plumREvents[i + 20] || {}, { type: 'camera', angle: 0, height: 18, radius: 10 });
+        }
     }
 })();
 
 levels['level5'] = {
     id: 'level5',
     name: 'Level 5: Plum - R',
-    bpm: 180,
+    bpm: 220, // Faster base BPM
     audioSrc: '/plum-r.mp3',
     path: plumRPath,
     events: plumREvents

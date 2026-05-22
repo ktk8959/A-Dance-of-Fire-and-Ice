@@ -150,6 +150,10 @@ function loadLevel(levelId) {
         if (dir === 'D') currentPos.z += tileSize;
         if (dir === 'L') currentPos.x -= tileSize;
         if (dir === 'R') currentPos.x += tileSize;
+        if (dir === 'E') { currentPos.x += tileSize; currentPos.z -= tileSize; }
+        if (dir === 'C') { currentPos.x += tileSize; currentPos.z += tileSize; }
+        if (dir === 'Z') { currentPos.x -= tileSize; currentPos.z += tileSize; }
+        if (dir === 'Q') { currentPos.x -= tileSize; currentPos.z -= tileSize; }
         if (currentLevelData.events && currentLevelData.events[i]) {
             const ev = currentLevelData.events[i];
             if (ev.type === 'elevation' || ev.amount !== undefined) {
@@ -165,6 +169,10 @@ function loadLevel(levelId) {
             if (branch.dir === 'D') bPos.z += tileSize;
             if (branch.dir === 'L') bPos.x -= tileSize;
             if (branch.dir === 'R') bPos.x += tileSize;
+            if (branch.dir === 'E') { bPos.x += tileSize; bPos.z -= tileSize; }
+            if (branch.dir === 'C') { bPos.x += tileSize; bPos.z += tileSize; }
+            if (branch.dir === 'Z') { bPos.x -= tileSize; bPos.z += tileSize; }
+            if (branch.dir === 'Q') { bPos.x -= tileSize; bPos.z -= tileSize; }
             tileObj.branchPos = bPos;
             tileObj.branchData = branch;
         }
@@ -609,3 +617,4 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
