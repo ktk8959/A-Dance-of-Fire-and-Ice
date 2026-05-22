@@ -2778,55 +2778,78 @@ const plumRPath = [];
 const plumREvents = {};
 
 (function generatePlum() {
-    let totalTiles = 500;
+    let tileIndex = 0;
     
-    // Intro
-    for (let i = 0; i < 15; i++) {
-        plumRPath.push('R');
-    }
-    
-    // Octagon Magic Circles
-    const octagon = ['R', 'C', 'D', 'Z', 'L', 'Q', 'U', 'E'];
-    const octagonRev = ['R', 'E', 'U', 'Q', 'L', 'Z', 'D', 'C'];
-    const fastZigZag = ['E', 'C', 'E', 'C', 'E', 'C', 'E', 'C'];
-    const fastZigZag2 = ['R', 'U', 'L', 'U', 'R', 'U', 'L', 'U'];
-    
-    for (let i = 15; i < totalTiles; i++) {
-        let section = Math.floor((i - 15) / 40);
-        
-        if (section % 4 === 0) {
-            // Magic Circle Octagon
-            let idx = (i - 15) % 8;
-            plumRPath.push(octagon[idx]);
-            if (idx === 7) plumREvents[i] = { type: 'twirl' };
-        } else if (section % 4 === 1) {
-            // High speed diagonal zigzags
-            plumRPath.push(i % 2 === 0 ? 'E' : 'C');
-            if (i % 20 === 0) plumREvents[i] = { type: 'speed', bpm: 400 };
-            if (i % 20 === 19) plumREvents[i] = { type: 'speed', bpm: 200 };
-        } else if (section % 4 === 2) {
-            // Reverse Octagon
-            let idx = (i - 15) % 8;
-            plumRPath.push(octagonRev[idx]);
-            if (idx === 7) plumREvents[i] = { type: 'twirl' };
-        } else {
-            // Intense stairs
-            plumRPath.push(i % 2 === 0 ? 'R' : 'U');
-            if (i % 20 === 0) plumREvents[i] = { type: 'speed', bpm: 300 };
-        }
-        
-        // Camera events
-        if (i % 40 === 0) {
-            plumREvents[i] = Object.assign(plumREvents[i] || {}, { type: 'camera', angle: Math.PI / 2, height: 25, radius: 25 });
-            plumREvents[i + 20] = Object.assign(plumREvents[i + 20] || {}, { type: 'camera', angle: 0, height: 18, radius: 10 });
+    function addPath(dirs, elevationPerTile = 0, speed = 0, twirlMod = 0) {
+        for (let i = 0; i < dirs.length; i++) {
+            plumRPath.push(dirs[i]);
+            let ev = {};
+            if (elevationPerTile !== 0) {
+                ev.type = 'elevation';
+                ev.amount = elevationPerTile;
+            }
+            if (speed !== 0 && i === 0) {
+                ev.type = 'speed';
+                ev.bpm = speed;
+            }
+            if (twirlMod > 0 && i % twirlMod === 0) {
+                ev.type = 'twirl';
+            }
+            if (Object.keys(ev).length > 0) plumREvents[tileIndex] = ev;
+            tileIndex++;
         }
     }
+
+    // 1. Intro (Fast Straight)
+    addPath(['R','R','R','R','R','R','R','R','R','R'], 0, 300);
+    
+    // 2. Star Tower (from Image 2) - 4 pointed star twisting upwards!
+    const starPiece = ['U', 'E', 'R', 'C', 'R', 'C', 'D', 'Z', 'D', 'Z', 'L', 'Q', 'L', 'Q', 'U', 'E'];
+    // Add camera circling event
+    plumREvents[tileIndex] = { type: 'camera', angle: Math.PI / 3, height: 15, radius: 25 };
+    for (let i = 0; i < 6; i++) {
+        // elevation of 0.5 per tile makes a smooth 3D helix star
+        addPath(starPiece, 0.5); 
+    }
+    
+    // 3. Drop down & bridge
+    plumREvents[tileIndex] = { type: 'camera', angle: 0, height: 10, radius: 10 };
+    addPath(['R','R','E','C','R','R','E','C','R','R'], -2, 400); // Super fast drop
+    
+    // 4. Large Hollow Octagon (from Image 1 clover/knot)
+    const cloverPiece = ['R', 'C', 'D', 'D', 'Z', 'L', 'L', 'Q', 'U', 'U', 'E', 'R'];
+    plumREvents[tileIndex] = { type: 'camera', angle: Math.PI / 4, height: 20, radius: 30 };
+    for (let i = 0; i < 8; i++) {
+        addPath(cloverPiece, 0.4); 
+    }
+    
+    // 5. Fast Zig-Zag Bridge
+    plumREvents[tileIndex] = { type: 'camera', angle: 0, height: 15, radius: 15 };
+    addPath(['E','C','E','C','E','C','E','C','E','C','E','C'], 0, 450);
+    
+    // 6. Double Star Tower (Reverse elevation, going down)
+    plumREvents[tileIndex] = { type: 'camera', angle: -Math.PI / 3, height: -10, radius: 25 };
+    for (let i = 0; i < 6; i++) {
+        addPath(starPiece, -0.5, 300); 
+    }
+    
+    // 7. Small Magic Circles with Twirls
+    const smallCircle = ['R', 'C', 'D', 'Z', 'L', 'Q', 'U', 'E'];
+    plumREvents[tileIndex] = { type: 'camera', angle: Math.PI / 2, height: 30, radius: 0 }; // Top down view
+    for (let i = 0; i < 8; i++) {
+        addPath(smallCircle, 0, 350, 4); // Twirl every 4 tiles
+    }
+    
+    // 8. Outro
+    plumREvents[tileIndex] = { type: 'camera', angle: 0, height: 10, radius: 10 };
+    addPath(['R','R','R','R','R','R','R','R','R','R'], 0, 200);
+
 })();
 
 levels['level5'] = {
     id: 'level5',
-    name: 'Level 5: Plum - R',
-    bpm: 220, // Faster base BPM
+    name: 'Level 5: Plum - R (3D Magic Shapes)',
+    bpm: 300, 
     audioSrc: '/plum-r.mp3',
     path: plumRPath,
     events: plumREvents
